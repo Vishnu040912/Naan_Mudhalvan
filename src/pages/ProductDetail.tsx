@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
-import { Star } from "lucide-react";
+import { Star, ShoppingCart } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useCart } from "@/contexts/CartContext";
 
 interface Product {
   id: string;
@@ -21,9 +22,36 @@ interface Product {
 
 const ProductDetail = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const { addToCart } = useCart();
+
+  const handleAddToCart = () => {
+    if (product) {
+      addToCart({
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        imageUrl: product.image_url,
+        sku: product.sku,
+      });
+    }
+  };
+
+  const handleBuyNow = () => {
+    if (product) {
+      addToCart({
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        imageUrl: product.image_url,
+        sku: product.sku,
+      });
+      navigate('/checkout');
+    }
+  };
 
   useEffect(() => {
     if (id) {
@@ -139,18 +167,24 @@ const ProductDetail = () => {
               </p>
             </div>
 
-            <Button
-              className="w-full snipcart-add-item bg-accent hover:bg-accent/90 text-accent-foreground text-lg py-6 shadow-glow"
-              disabled={product.inventory === 0}
-              data-item-id={product.sku}
-              data-item-price={product.price}
-              data-item-url={`/product/${product.id}`}
-              data-item-description={product.description}
-              data-item-image={product.image_url}
-              data-item-name={product.name}
-            >
-              {product.inventory > 0 ? "Add to Cart" : "Out of Stock"}
-            </Button>
+            <div className="flex gap-4">
+              <Button
+                variant="outline"
+                className="flex-1 text-lg py-6"
+                disabled={product.inventory === 0}
+                onClick={handleAddToCart}
+              >
+                <ShoppingCart className="h-5 w-5 mr-2" />
+                Add to Cart
+              </Button>
+              <Button
+                className="flex-1 bg-accent hover:bg-accent/90 text-accent-foreground text-lg py-6 shadow-glow"
+                disabled={product.inventory === 0}
+                onClick={handleBuyNow}
+              >
+                {product.inventory > 0 ? "Buy Now" : "Out of Stock"}
+              </Button>
+            </div>
           </div>
         </div>
       </main>

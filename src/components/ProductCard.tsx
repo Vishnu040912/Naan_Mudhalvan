@@ -1,7 +1,8 @@
-import { Star } from "lucide-react";
+import { Star, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
+import { useCart } from "@/contexts/CartContext";
 
 interface ProductCardProps {
   id: string;
@@ -15,6 +16,18 @@ interface ProductCardProps {
 
 const ProductCard = ({ id, name, price, imageUrl, rating, sku, description }: ProductCardProps) => {
   const navigate = useNavigate();
+  const { addToCart } = useCart();
+
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    addToCart({ id, name, price, imageUrl, sku });
+  };
+
+  const handleBuyNow = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    addToCart({ id, name, price, imageUrl, sku });
+    navigate('/checkout');
+  };
 
   return (
     <Card className="group overflow-hidden shadow-card hover:shadow-card-hover transition-all duration-300 cursor-pointer border-border">
@@ -46,17 +59,20 @@ const ProductCard = ({ id, name, price, imageUrl, rating, sku, description }: Pr
           ${price.toFixed(2)}
         </p>
       </CardContent>
-      <CardFooter className="p-4 pt-0">
+      <CardFooter className="p-4 pt-0 flex gap-2">
         <Button
-          className="w-full snipcart-add-item bg-accent hover:bg-accent/90 text-accent-foreground shadow-glow"
-          data-item-id={sku}
-          data-item-price={price}
-          data-item-url={`/product/${id}`}
-          data-item-description={description}
-          data-item-image={imageUrl}
-          data-item-name={name}
+          variant="outline"
+          className="flex-1"
+          onClick={handleAddToCart}
         >
+          <ShoppingCart className="h-4 w-4 mr-2" />
           Add to Cart
+        </Button>
+        <Button
+          className="flex-1 bg-accent hover:bg-accent/90 text-accent-foreground"
+          onClick={handleBuyNow}
+        >
+          Buy Now
         </Button>
       </CardFooter>
     </Card>

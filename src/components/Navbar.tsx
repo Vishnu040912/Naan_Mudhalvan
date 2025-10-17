@@ -1,12 +1,15 @@
 import { ShoppingCart, Search, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useCart } from "@/contexts/CartContext";
 
 const Navbar = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
+  const { totalItems } = useCart();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,10 +55,15 @@ const Navbar = () => {
           <Button
             variant="ghost"
             size="icon"
-            className="snipcart-checkout text-primary-foreground hover:bg-primary-glow relative"
+            className="text-primary-foreground hover:bg-primary-glow relative"
+            onClick={() => navigate('/cart')}
           >
             <ShoppingCart className="h-6 w-6" />
-            <span className="snipcart-items-count absolute -top-1 -right-1 bg-accent text-accent-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold"></span>
+            {totalItems > 0 && (
+              <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 bg-accent text-accent-foreground border-none">
+                {totalItems}
+              </Badge>
+            )}
           </Button>
         </div>
 
